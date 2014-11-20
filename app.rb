@@ -3,9 +3,14 @@
 require 'sinatra'
 require 'sinatra/activerecord'
 require './environments'
+require 'sinatra/flash'
+require 'sinatra/redirect_with_flash'
 
+enable :sessions
 
 class Post < ActiveRecord::Base
+  validates :title, presence: true, length: { minimum: 5}
+  validates :body, presence: true
 end
 
 get "/" do
@@ -33,9 +38,9 @@ end
 post "/posts" do
  @post = Post.new(params[:post])
  if @post.save
-   redirect "posts/#{@post.id}"
+   redirect "posts/#{@post.id}", :notice => 'Congrats, you have made a new post. (This message will evaporate after 4 seconds)'
  else
-   erb :"posts/create"
+   redirect "posts/create", :error => 'There was an error, please try again. (This message will evaporate after 4 seconds)'
  end
 end
 
